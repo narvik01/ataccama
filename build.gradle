@@ -1,0 +1,34 @@
+plugins {
+	id 'org.springframework.boot' version '2.3.4.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+	id 'java'
+	id "io.freefair.lombok" version "5.2.1"
+}
+
+group = 'cz.strangeloop'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+
+	testCompile "org.spockframework:spock-core:1.1-groovy-2.4-rc-2"
+	implementation platform('org.testcontainers:testcontainers-bom:1.14.3')
+	testImplementation "org.testcontainers:postgresql"
+	testImplementation "org.testcontainers:spock"
+
+}
+
+test {
+	useJUnitPlatform()
+}
