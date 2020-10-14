@@ -1,13 +1,13 @@
 package cz.strangeloop.ataccama;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import spock.lang.Specification;
 
 @SpringBootTest
-class AtaccamaApplicationTests {
+class AtaccamaApplicationTests extends Specification {
 
-	@Test
-	void contextLoads() {
+	def "test"() {
+
 	}
 
 }

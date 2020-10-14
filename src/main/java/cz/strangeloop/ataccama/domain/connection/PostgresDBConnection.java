@@ -2,9 +2,7 @@ package cz.strangeloop.ataccama.domain.connection;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.util.UUID;
 
@@ -14,6 +12,7 @@ import java.util.UUID;
 public class PostgresDBConnection {
 
     @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
     private UUID id;
     @NotBlank
     private String name;

@@ -2,6 +2,12 @@
 
 ## Usage
 
+./gradlew clean build bootBuildImage && docker-compose up
+
+### Requirements
+* Java 11
+* Docker
+
 ## Testing
 
 ## Technologies
