@@ -1,12 +1,5 @@
 version: '3'
 services:
-  database:
-    image: "postgres"
-    environment:
-      POSTGRES_USER: main
-      POSTGRES_PASSWORD: main
-      POSTGRES_DB: main
-    ports: [ 5432 ]
   ataccama:
     image: "ataccama:0.0.1-SNAPSHOT"
     ports:

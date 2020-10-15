@@ -24,7 +24,7 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="databaseName" type="clob">
+            <column name="database_name" type="clob">
                 <constraints nullable="false"/>
             </column>
 

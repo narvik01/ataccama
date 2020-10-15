@@ -1,6 +1,8 @@
 package cz.strangeloop.ataccama.api;
 
+import cz.strangeloop.ataccama.api.dto.PostgresDBConnectionDto;
 import cz.strangeloop.ataccama.domain.connection.PostgresDBConnection;
+import cz.strangeloop.ataccama.mapper.DtoMapper;
 import cz.strangeloop.ataccama.service.DBConnectionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,39 +20,44 @@ import static cz.strangeloop.ataccama.api.ConnectionController.PATH;
 @RequiredArgsConstructor
 public class ConnectionController {
 
-    //TODO use DTOs
-
     static final String PATH = "/connections";
+
+    private final DtoMapper dtoMapper;
     private final DBConnectionService dbConnectionService;
 
     @GetMapping
-    public ResponseEntity<List<PostgresDBConnection>> list() {
+    public ResponseEntity<List<PostgresDBConnectionDto>> list() {
         List<PostgresDBConnection> postgresDBConnectionList = dbConnectionService.list();
         if (postgresDBConnectionList.isEmpty()) {
             return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.ok(postgresDBConnectionList);
+            return ResponseEntity.ok(dtoMapper.mapConnections(postgresDBConnectionList));
         }
     }
 
+    @GetMapping("/{id}")
+    public PostgresDBConnectionDto get(@PathVariable UUID id) {
+        PostgresDBConnection postgresDBConnection = dbConnectionService.find(id);
+        return dtoMapper.mapConnection(postgresDBConnection);
+    }
+
     @PostMapping
-    public ResponseEntity<Void> post(UriComponentsBuilder uriComponentBuilder, @RequestBody PostgresDBConnection postgresDBConnection) {
-        UUID id = dbConnectionService.create(postgresDBConnection);
+    public ResponseEntity<Void> post(UriComponentsBuilder uriComponentBuilder, @RequestBody PostgresDBConnectionDto postgresDBConnection) {
+        UUID id = dbConnectionService.create(dtoMapper.mapConnection(postgresDBConnection));
         URI location = uriComponentBuilder.path(PATH + "/{id}")
                 .buildAndExpand(id.toString())
                 .toUri();
         return ResponseEntity.created(location).build();
     }
 
-    @PutMapping(PATH + "/{id}")
-    public void put(@RequestParam UUID id, @RequestBody PostgresDBConnection postgresDBConnection) {
-        dbConnectionService.update(id, postgresDBConnection);
+    @PutMapping("/{id}")
+    public void put(@PathVariable UUID id, @RequestBody PostgresDBConnectionDto postgresDBConnection) {
+        dbConnectionService.update(id, dtoMapper.mapConnection(postgresDBConnection));
     }
 
-    @DeleteMapping
-    public void delete(@RequestParam UUID id) {
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable UUID id) {
         dbConnectionService.delete(id);
     }
-
 
 }
