@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.TestPropertySource
 import org.testcontainers.containers.DockerComposeContainer
 import org.testcontainers.spock.Testcontainers
@@ -16,6 +17,7 @@ import spock.lang.Stepwise
 @TestPropertySource("classpath:application-test.properties")
 @Testcontainers
 @Stepwise
+@DirtiesContext
 class ConnectionIntegrationTests extends Specification {
 
     private static final int DBPORT = 5432

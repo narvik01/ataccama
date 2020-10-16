@@ -1,0 +1,8 @@
+{
+  "name": "external2",
+  "hostname": "ataccama_external_database_2_1",
+  "port": 5432,
+  "databaseName": "externaldb2",
+  "username": "external2",
+  "password": "extpass2"
+}

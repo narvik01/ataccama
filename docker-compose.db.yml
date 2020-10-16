@@ -12,9 +12,13 @@ services:
       POSTGRES_USER: external
       POSTGRES_PASSWORD: extpass
       POSTGRES_DB: externaldb
+    volumes:
+      - ./data/world.sql:/docker-entrypoint-initdb.d/init.sql
   external_database_2:
-    image: "postgres"
+    image: "aa8y/postgres-dataset:world"
     environment:
       POSTGRES_USER: external2
       POSTGRES_PASSWORD: extpass2
       POSTGRES_DB: externaldb2
+    volumes:
+      - ./data/iso-3166.sql:/docker-entrypoint-initdb.d/init.sql

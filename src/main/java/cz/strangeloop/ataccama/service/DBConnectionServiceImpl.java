@@ -4,6 +4,7 @@ import cz.strangeloop.ataccama.db.DBConnectionRepository;
 import cz.strangeloop.ataccama.domain.connection.PostgresDBConnection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.UUID;
 public class DBConnectionServiceImpl implements DBConnectionService {
 
     private final DBConnectionRepository dbConnectionRepository;
+    private final DBConnectionProvider dbConnectionProvider;
 
     @Override
     public List<PostgresDBConnection> list() {
@@ -35,7 +37,12 @@ public class DBConnectionServiceImpl implements DBConnectionService {
 
     @Override
     public void delete(UUID id) {
-        dbConnectionRepository.deleteById(id);
+        try {
+            dbConnectionRepository.deleteById(id);
+            dbConnectionProvider.invalidate(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException();
+        }
     }
 
     @Override
@@ -47,5 +54,6 @@ public class DBConnectionServiceImpl implements DBConnectionService {
 
         postgresDBConnection.setId(id); //do not allow to change id by the body
         dbConnectionRepository.save(postgresDBConnection);
+        dbConnectionProvider.invalidate(id);
     }
 }
