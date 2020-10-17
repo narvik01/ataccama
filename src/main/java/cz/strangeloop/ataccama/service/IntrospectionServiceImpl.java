@@ -11,10 +11,7 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.utility.SchemaCrawlerUtility;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -75,17 +72,23 @@ public class IntrospectionServiceImpl implements IntrospectionService {
     @Override
     public List<Map<String, String>> getDataPreview(UUID id, String schema, String table, int count) {
         Connection connection = dbConnectionProvider.getConnection(id);
-        try {
+        try (connection) {
             connection.setSchema(schema);
             String query = "SELECT * FROM " + table + " LIMIT " + count;
-            ResultSet rs = connection.createStatement().executeQuery(query);
-            List<Map<String,String>> data = new ArrayList<>();
-            while (rs.next()) {
-                Map<String, String> map = convertResultSetToMap(rs);
-                data.add(map);
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(query);
+            try (statement; rs) {
+                List<Map<String, String>> data = new ArrayList<>();
+                while (rs.next()) {
+                    Map<String, String> map = convertResultSetToMap(rs);
+                    data.add(map);
+                }
+                return data;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                //todo
+                throw new RuntimeException();
             }
-
-            return data;
         } catch (SQLException e) {
             e.printStackTrace();
             //todo

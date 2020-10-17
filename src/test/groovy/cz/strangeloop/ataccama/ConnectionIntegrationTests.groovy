@@ -20,7 +20,6 @@ import spock.lang.Stepwise
 @DirtiesContext
 class ConnectionIntegrationTests extends Specification {
 
-    private static final int DBPORT = 5432
     public static final String PATH = "/connections"
 
     @Autowired
@@ -28,10 +27,7 @@ class ConnectionIntegrationTests extends Specification {
 
     @Shared
     public static DockerComposeContainer dbContainer =
-            new DockerComposeContainer(new File("docker-compose.db.yml"))
-                    .withExposedService("main_database_1", DBPORT)
-                    .withExposedService("external_database_1_1", DBPORT)
-                    .withExposedService("external_database_2_1", DBPORT)
+            new DockerComposeContainer(new File("docker-compose.yml"), new File("docker-compose.dbexamples.yml"))
 
     def "list no connections"() {
         when: "loading a list of connections after start"

@@ -1,11 +1,5 @@
 version: '3'
 services:
-  main_database:
-    image: "postgres"
-    environment:
-      POSTGRES_USER: main
-      POSTGRES_PASSWORD: main
-      POSTGRES_DB: main
   external_database_1:
     image: "postgres"
     environment:

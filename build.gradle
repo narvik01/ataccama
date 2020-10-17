@@ -4,6 +4,7 @@ plugins {
 	id 'java'
 	id 'groovy'
 	id "io.freefair.lombok" version "5.2.1"
+	id "com.github.spotbugs-base" version "4.5.1"
 }
 
 group = 'cz.strangeloop'

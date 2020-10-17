@@ -14,6 +14,7 @@ public class AtaccamaApplication {
 
 	//TODO cleanup data
 	//TODO comments
+	//TODO logback config
 
 	public static void main(String[] args) {
 		SpringApplication.run(AtaccamaApplication.class, args);

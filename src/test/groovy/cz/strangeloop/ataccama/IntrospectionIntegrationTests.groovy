@@ -20,20 +20,16 @@ import spock.lang.Stepwise
 @DirtiesContext
 class IntrospectionIntegrationTests extends Specification {
 
+    //TODO check other schema than public
     //TODO invalid values tests
-
-    private static final int DBPORT = 5432
-    public static final String PATH = "/connections"
 
     @Autowired
     TestRestTemplate rt
 
     @Shared
     public static DockerComposeContainer dbContainer =
-            new DockerComposeContainer(new File("docker-compose.db.yml"))
-                    .withExposedService("main_database_1", DBPORT)
-                    .withExposedService("external_database_1_1", DBPORT)
-                    .withExposedService("external_database_2_1", DBPORT)
+            new DockerComposeContainer(new File("docker-compose.yml"), new File("docker-compose.dbexamples.yml"))
+
 
     def "get schemas and tables"() {
         given:
@@ -48,8 +44,8 @@ class IntrospectionIntegrationTests extends Specification {
             def connectionId = location.tokenize('/')[-1]
 
         when: "lists of schemas and tables are loaded"
-            def schemas = rt.getForObject("/introspection/$connectionId/schemas", SchemaDto[].class)
-            def tables = rt.getForObject("/introspection/$connectionId/schemas/public/tables", TableDto[].class)
+            def schemas = rt.getForObject("/connections/$connectionId/schemas", SchemaDto[].class)
+            def tables = rt.getForObject("/connections/$connectionId/schemas/public/tables", TableDto[].class)
         then:
             schemas.length != 0
 //            tables.length != 0

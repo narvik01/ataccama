@@ -6,10 +6,7 @@ import cz.strangeloop.ataccama.api.dto.TableDto;
 import cz.strangeloop.ataccama.mapper.DtoMapper;
 import cz.strangeloop.ataccama.service.IntrospectionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
@@ -18,15 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static cz.strangeloop.ataccama.api.IntrospectionController.PATH;
-
+import static cz.strangeloop.ataccama.api.ConnectionController.PATH;
 @RestController
 @RequestMapping(PATH)
 @RequiredArgsConstructor
 public class IntrospectionController {
-
-    //TODO rename to connection
-    static final String PATH = "/introspection";
 
     private final IntrospectionService introspectionService;
     private final DtoMapper dtoMapper;
@@ -50,8 +43,9 @@ public class IntrospectionController {
     }
 
     @GetMapping("/{id}/schemas/{schema}/tables/{table}/data")
-    public List<Map<String, String>> dataPreview(@PathVariable UUID id, @PathVariable String schema, @PathVariable String table) {
-        int count = 10; //todo
+    public List<Map<String, String>> dataPreview(@PathVariable UUID id, @PathVariable String schema,
+                                                 @PathVariable String table,
+                                                 @RequestParam(defaultValue = "10", required = false) int count) {
         return introspectionService.getDataPreview(id, schema, table, count);
     }
 
