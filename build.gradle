@@ -4,7 +4,8 @@ plugins {
 	id 'java'
 	id 'groovy'
 	id "io.freefair.lombok" version "5.2.1"
-	id "com.github.spotbugs-base" version "4.5.1"
+	id "com.github.spotbugs" version "4.5.1"
+	id 'com.adarshr.test-logger' version '2.1.1'
 }
 
 group = 'cz.strangeloop'
@@ -48,4 +49,19 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+}
+
+spotbugsMain {
+	reports {
+		xml.enabled = false
+		html.enabled = true
+	}
+}
+
+
+spotbugsTest {
+	reports {
+		xml.enabled = false
+		html.enabled = true
+	}
 }

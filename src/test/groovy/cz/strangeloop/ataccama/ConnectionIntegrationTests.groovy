@@ -1,15 +1,16 @@
 package cz.strangeloop.ataccama
 
 import cz.strangeloop.ataccama.api.dto.PostgresDBConnectionDto
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.springframework.http.RequestEntity
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.TestPropertySource
-import org.testcontainers.containers.DockerComposeContainer
 import org.testcontainers.spock.Testcontainers
-import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
 
@@ -18,16 +19,13 @@ import spock.lang.Stepwise
 @Testcontainers
 @Stepwise
 @DirtiesContext
+@SuppressFBWarnings(value = "SE_NO_SERIALVERSIONID", justification = "serialVersionUID not generated in closures")
 class ConnectionIntegrationTests extends Specification {
 
     public static final String PATH = "/connections"
 
     @Autowired
     TestRestTemplate rt
-
-    @Shared
-    public static DockerComposeContainer dbContainer =
-            new DockerComposeContainer(new File("docker-compose.yml"), new File("docker-compose.dbexamples.yml"))
 
     def "list no connections"() {
         when: "loading a list of connections after start"
@@ -58,6 +56,13 @@ class ConnectionIntegrationTests extends Specification {
             list.count {it.name = name } == 1
     }
 
+    def "get unknown id"() {
+        when: "trying to load not existing id"
+            def entity = rt.getForEntity("$PATH/00000000-0000-0000-0000-000000000000", PostgresDBConnectionDto.class)
+        then: "404 not found"
+            entity.statusCode == HttpStatus.NOT_FOUND
+    }
+
     def "update a connection"() {
         given: "added connection"
             def location = rt.postForLocation(PATH, [
@@ -84,6 +89,21 @@ class ConnectionIntegrationTests extends Specification {
             list.count {it.name == 'wrongname'} == 0
     }
 
+    def "update unknown id"() {
+        when: "trying to update not existing id"
+            def entity = rt.exchange(new RequestEntity<PostgresDBConnectionDto>([
+                    name        : "external2",
+                    hostname    : "external_database_2",
+                    port        : 5432,
+                    databaseName: "externaldb2",
+                    username    : "external2",
+                    password    : "extpass2"
+            ], HttpMethod.PUT, "$PATH/00000000-0000-0000-0000-000000000000".toURI()), Void.class)
+        then: "404 not found"
+            entity.statusCode == HttpStatus.NOT_FOUND
+    }
+
+
     def "delete a connection"() {
         given: "added connection"
             def location = rt.postForLocation(PATH, [
@@ -100,6 +120,13 @@ class ConnectionIntegrationTests extends Specification {
             def list = rt.getForObject(PATH, PostgresDBConnectionDto[].class)
             list.length == 2
             list.count {it.name == 'wrongname2'} == 0
+    }
+
+    def "delete unknown id"() {
+        when: "trying to delete not existing id"
+            def entity = rt.exchange(new RequestEntity<Object>(HttpMethod.DELETE, "$PATH/00000000-0000-0000-0000-000000000000".toURI()), PostgresDBConnectionDto.class)
+        then: "404 not found"
+            entity.statusCode == HttpStatus.NOT_FOUND
     }
 
 }

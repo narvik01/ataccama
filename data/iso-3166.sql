@@ -1,5 +1,9 @@
 BEGIN;
 
+CREATE SCHEMA isoschema;
+
+SET search_path TO isoschema;
+
 SET client_encoding TO 'UNICODE';
 
 CREATE TABLE country (

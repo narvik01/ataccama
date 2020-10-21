@@ -1,5 +1,6 @@
 package cz.strangeloop.ataccama.service;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import schemacrawler.schema.Catalog;
@@ -20,6 +21,8 @@ public class IntrospectionServiceImpl implements IntrospectionService {
 
     private final DBConnectionProvider dbConnectionProvider;
 
+    private static final String GENERIC_SELECT = "SELECT * FROM ? LIMIT ?";
+
     @Override
     public List<Schema> getSchemas(UUID id) {
         SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
@@ -28,9 +31,7 @@ public class IntrospectionServiceImpl implements IntrospectionService {
             Collection<Schema> schemas = catalog.getSchemas();
             return new ArrayList<>(schemas);
         } catch (SchemaCrawlerException e) {
-            e.printStackTrace();
-            //TODO handle exception properly
-            throw new RuntimeException(e);
+            throw new UnknownDBException(e);
         }
     }
 
@@ -40,13 +41,11 @@ public class IntrospectionServiceImpl implements IntrospectionService {
         try {
             Catalog catalog = SchemaCrawlerUtility.getCatalog(dbConnectionProvider.getConnection(id), options);
             Optional<Schema> optionalSchema = catalog.getSchemas().stream().filter(s -> s.getName().equals(schema)).findAny();
-            Schema foundSchema = optionalSchema.orElseThrow(NotFoundException::new);
+            Schema foundSchema = optionalSchema.orElseThrow(() -> new NotFoundException("Schema does not exist."));
             Collection<Table> tables = catalog.getTables(foundSchema);
             return new ArrayList<>(tables);
         } catch (SchemaCrawlerException e) {
-            e.printStackTrace();
-            //TODO handle exception properly
-            throw new RuntimeException(e);
+            throw new UnknownDBException(e);
         }
     }
 
@@ -56,27 +55,27 @@ public class IntrospectionServiceImpl implements IntrospectionService {
         try {
             Catalog catalog = SchemaCrawlerUtility.getCatalog(dbConnectionProvider.getConnection(id), options);
             Optional<Schema> optionalSchema = catalog.getSchemas().stream().filter(s -> s.getName().equals(schema)).findAny();
-            Schema foundSchema = optionalSchema.orElseThrow(NotFoundException::new); //todo
+            Schema foundSchema = optionalSchema.orElseThrow(() -> new NotFoundException("Schema not found."));
             Collection<Table> tables = catalog.getTables(foundSchema);
             Optional<Table> optionalTable = tables.stream().filter(t -> t.getName().equals(table)).findAny();
-            Table foundTable = optionalTable.orElseThrow(NotFoundException::new);
+            Table foundTable = optionalTable.orElseThrow(() -> new NotFoundException("Table not found."));
             List<Column> columns = foundTable.getColumns();
             return new ArrayList<>(columns);
         } catch (SchemaCrawlerException e) {
-            e.printStackTrace();
-            //TODO handle exception properly
-            throw new RuntimeException(e);
+            throw new UnknownDBException(e);
         }
     }
 
     @Override
+    @SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE", justification = "False positive, no null check present")
     public List<Map<String, String>> getDataPreview(UUID id, String schema, String table, int count) {
         Connection connection = dbConnectionProvider.getConnection(id);
         try (connection) {
             connection.setSchema(schema);
-            String query = "SELECT * FROM " + table + " LIMIT " + count;
-            Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery(query);
+            String query = "SELECT * FROM " + table + " LIMIT ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, count);
+            ResultSet rs = statement.executeQuery();
             try (statement; rs) {
                 List<Map<String, String>> data = new ArrayList<>();
                 while (rs.next()) {
@@ -85,14 +84,10 @@ public class IntrospectionServiceImpl implements IntrospectionService {
                 }
                 return data;
             } catch (SQLException e) {
-                e.printStackTrace();
-                //todo
-                throw new RuntimeException();
+                throw new UnknownDBException(e);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            //todo
-            throw new RuntimeException();
+            throw new UnknownDBException(e);
         }
     }
 

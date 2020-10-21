@@ -26,7 +26,7 @@ public class DBConnectionServiceImpl implements DBConnectionService {
     @Override
     public PostgresDBConnection find(UUID connectionId) {
         Optional<PostgresDBConnection> byId = dbConnectionRepository.findById(connectionId);
-        return byId.orElseThrow(NotFoundException::new);
+        return byId.orElseThrow(() -> new NotFoundException("Connection with this id does not exist."));
     }
 
     @Override
@@ -41,7 +41,7 @@ public class DBConnectionServiceImpl implements DBConnectionService {
             dbConnectionRepository.deleteById(id);
             dbConnectionProvider.invalidate(id);
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException();
+            throw new NotFoundException("Connection with this id does not exist.");
         }
     }
 
@@ -49,7 +49,7 @@ public class DBConnectionServiceImpl implements DBConnectionService {
     public void update(UUID id, PostgresDBConnection postgresDBConnection) {
         Optional<PostgresDBConnection> loadedConnection = dbConnectionRepository.findById(id);
         if (loadedConnection.isEmpty()) {
-            throw new NotFoundException();
+            throw new NotFoundException("Connection with this id does not exist.");
         }
 
         postgresDBConnection.setId(id); //do not allow to change id by the body

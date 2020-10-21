@@ -3,10 +3,9 @@ package cz.strangeloop.ataccama.service;
 import cz.strangeloop.ataccama.db.DBConnectionRepository;
 import cz.strangeloop.ataccama.domain.connection.PostgresDBConnection;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.postgresql.util.PSQLState;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -34,22 +33,21 @@ public class DBConnectionProvider {
         try {
             return dataSource.getConnection();
         } catch (SQLException e) {
-            //TODO proper handling
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            String sqlState = e.getSQLState();
+            if (PSQLState.INVALID_PASSWORD.getState().equals(sqlState)) {
+                throw new CredentialsException(e);
+            }
+            throw new UnknownDBException(e);
         }
     }
 
     public void invalidate(UUID uuid) {
-        DataSource removedDS = dataSourceMap.remove(uuid);
-        if (removedDS == null) {
-            throw new NotFoundException();
-        }
+        dataSourceMap.remove(uuid);
     }
 
     private DataSource createDataSource(UUID uuid) {
         Optional<PostgresDBConnection> optionalConnection = dbConnectionRepository.findById(uuid);
-        PostgresDBConnection postgresDBConnection = optionalConnection.orElseThrow(NotFoundException::new);
+        PostgresDBConnection postgresDBConnection = optionalConnection.orElseThrow(() -> new NotFoundException("Connection with this id does not exist."));
         return DataSourceBuilder.create()
                 .driverClassName(driverClassName)
                 .url(constructJdbcUrl(postgresDBConnection))

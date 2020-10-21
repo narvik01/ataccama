@@ -22,7 +22,6 @@ public class PostgresDBConnection {
     @Max(65535)
     private int port;
 
-    //TODO can credentials be empty?
     private String databaseName;
     private String username;
     private String password;

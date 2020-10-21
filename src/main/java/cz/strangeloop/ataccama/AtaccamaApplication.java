@@ -12,10 +12,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class AtaccamaApplication {
 
-	//TODO cleanup data
-	//TODO comments
-	//TODO logback config
-
 	public static void main(String[] args) {
 		SpringApplication.run(AtaccamaApplication.class, args);
 	}

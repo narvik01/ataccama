@@ -37,6 +37,10 @@ public interface DtoMapper {
         return grant.getGrantee();
     }
 
+    default String mapForeignKey(ForeignKey fk) {
+        return fk.getName();
+    }
+
 
     @Mapping(target = "constraints", source = "tableConstraints")
     @Mapping(target = "grants", source = "privileges")
