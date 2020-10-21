@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface IntrospectionService {
+
     List<Schema> getSchemas(UUID id);
 
     List<Table> getTables(UUID id, String schema);

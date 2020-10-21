@@ -21,8 +21,6 @@ public class IntrospectionServiceImpl implements IntrospectionService {
 
     private final DBConnectionProvider dbConnectionProvider;
 
-    private static final String GENERIC_SELECT = "SELECT * FROM ? LIMIT ?";
-
     @Override
     public List<Schema> getSchemas(UUID id) {
         SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();

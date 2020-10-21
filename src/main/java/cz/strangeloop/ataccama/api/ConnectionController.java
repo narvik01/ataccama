@@ -15,6 +15,9 @@ import java.util.UUID;
 
 import static cz.strangeloop.ataccama.api.ConnectionController.PATH;
 
+/**
+ * DB Connection API, create, update, delete, list
+ */
 @RestController
 @RequestMapping(PATH)
 @RequiredArgsConstructor
