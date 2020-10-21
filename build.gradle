@@ -41,9 +41,9 @@ dependencies {
 
 	testImplementation 'org.spockframework:spock-core:2.0-M3-groovy-2.5'
 	testImplementation 'org.spockframework:spock-spring:2.0-M3-groovy-2.5'
-	implementation platform('org.testcontainers:testcontainers-bom:1.14.3')
-	testImplementation "org.testcontainers:postgresql"
-	testImplementation "org.testcontainers:spock"
+	implementation platform('org.testcontainers:testcontainers-bom:1.15.0-rc2')
+	testImplementation "org.testcontainers:postgresql:1.15.0-rc2"
+	testImplementation "org.testcontainers:spock:1.15.0-rc2"
 
 }
 

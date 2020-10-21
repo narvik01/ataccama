@@ -7,7 +7,8 @@
 ## Usage
 Build and run:
 ```
-./gradlew clean build bootBuildImage && docker-compose -f docker-compose.yml -f docker-compose.dbexamples.yml up
+./gradlew clean build 
+./gradlew bootBuildImage && docker-compose -f docker-compose.yml -f docker-compose.dbexamples.yml up
 ...
 docker-compose down --remove-orphans
 ```
