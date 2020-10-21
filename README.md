@@ -1,6 +1,4 @@
-# Ataccama interview task
-
-Ondřej Hamák, hamak@email.cz
+#Ataccama
 
 ## Requirements
 * Java 11
